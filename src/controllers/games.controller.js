@@ -10,7 +10,7 @@ async function listGames (req, res) {
 async function createGame (req, res) {
 
     const gameData = res.locals.gameData
-    console.log(gameData)
+    
     res.sendStatus(STATUS_CODE.CREATED)
 }
 
