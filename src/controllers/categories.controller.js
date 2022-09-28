@@ -1,4 +1,4 @@
-import STATUS_CODE from "../enums/statusCode.enum"
+import STATUS_CODE from "../enums/statusCode.enum.js"
 
 async function listCategories (req, res) {
     
@@ -7,6 +7,8 @@ async function listCategories (req, res) {
 
 async function createCategorie (req, res) {
 
+    const categoryName = res.locals.categoryName
+    
     res.sendStatus(STATUS_CODE.CREATED)
 }
 

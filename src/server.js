@@ -2,6 +2,7 @@ import express from "express"
 import dotenv from "dotenv"
 import cors from "cors"
 import CategoriesRouter from "./routers/categories.router.js"
+import GamesRouter from "./routers/games.router.js"
 dotenv.config()
 
 const server = express()
@@ -11,6 +12,7 @@ server
     .use(cors())
     .use(express.json())
     .use(CategoriesRouter)
+    .use(GamesRouter)
 
 server.get("/status", (req, res) => {
     res.send("server it's on")

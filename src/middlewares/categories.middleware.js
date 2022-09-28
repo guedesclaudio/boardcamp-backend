@@ -1,24 +1,26 @@
 import joi from "joi" 
 import STATUS_CODE from "../enums/statusCode.enum.js"
 
-const schemaCategorieName = joi.object({
+const schemaCategoryName = joi.object({
     name: joi.string().empty().trim().required()
 })
 
 
-async function categorieCreateValidation (req, res, next) {
+async function categoryCreateValidation (req, res, next) {
 
     const {name} = req.body
-
-    const {error} = schemaCategorieName.validate(name, {abortEarly: false})
+    const {error} = schemaCategoryName.validate({name}, {abortEarly: false})
 
     if (error) {
         const errors = error.details.map(value => value.message) 
-        return res.status(STATUS_CODE.UNPROCESSABLE).send(errors)
+        return res.status(STATUS_CODE.BAD_REQUEST).send(errors)
     }
-    res.locals.categorieName = name
+
+    //verificar se existe um jogo com o categoryName => 400
+
+    res.locals.categoryName = name
     next()
     
 }
 
-export {categorieCreateValidation}
+export {categoryCreateValidation}
