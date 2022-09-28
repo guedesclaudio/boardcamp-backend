@@ -19,7 +19,7 @@ async function gameCreateValidation (req, res, next) {
         return res.status(STATUS_CODE.BAD_REQUEST).send(errors)
     }
 
-    //verificar se existe uma categoria com o categoryId => 400
+    //verificar se existe uma categoria com o categoryId => 409
 
     res.locals.gameData = req.body
     next()

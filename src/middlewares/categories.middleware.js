@@ -16,7 +16,7 @@ async function categoryCreateValidation (req, res, next) {
         return res.status(STATUS_CODE.BAD_REQUEST).send(errors)
     }
 
-    //verificar se existe um jogo com o categoryName => 400
+    //verificar se existe um jogo com o categoryName => 409
 
     res.locals.categoryName = name
     next()
