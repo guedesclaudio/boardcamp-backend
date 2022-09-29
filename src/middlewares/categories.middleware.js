@@ -1,4 +1,5 @@
 import joi from "joi" 
+import connection from "../database/database.js"
 import STATUS_CODE from "../enums/statusCode.enum.js"
 
 const schemaCategoryName = joi.object({
@@ -15,12 +16,20 @@ async function categoryCreateValidation (req, res, next) {
         const errors = error.details.map(value => value.message) 
         return res.status(STATUS_CODE.BAD_REQUEST).send(errors)
     }
+    
+    try {
+        const categories = await connection.query(`SELECT * FROM categories WHERE name = $1;`, [name])
 
-    //verificar se existe um jogo com o categoryName => 409
+        if (categories.rows.length > 0) {
+            return res.sendStatus(STATUS_CODE.CONFLICT)
+        }
+
+    } catch (error) {
+        res.sendStatus(STATUS_CODE.SERVER_ERROR)
+    }
 
     res.locals.categoryName = name
     next()
-    
 }
 
 export {categoryCreateValidation}
