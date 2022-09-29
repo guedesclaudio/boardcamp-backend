@@ -4,12 +4,16 @@ import connection from "../database/database.js"
 async function listClients (req, res) {
 
     const {cpf} = req.query
+    const query1 = `SELECT * FROM customers WHERE cpf LIKE '${cpf}%'`
+    const query2 = `SELECT * FROM customers;`
+    const query = cpf ? query1 : query2
 
     try {
-        const clients = await connection.query('SELECT * FROM customers;')
+        const clients = await connection.query(query)
         res.send(clients.rows)
     } catch (error) {
         console.error(error)
+        res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 }
 
@@ -17,31 +21,65 @@ async function listClientsById (req, res) {
 
     const {id} = req.params
 
-    if (!id) {
+    if (!id || isNaN(id)) {
         return res.sendStatus(STATUS_CODE.UNAUTHORIZED)
     }
 
-    res.send("cliente filtrado pelo id")
+    try {
+        const client = await connection.query(`SELECT * FROM customers WHERE id = $1;`, [id])
+
+        if (client.rows.length === 0) {
+            return res.sendStatus(STATUS_CODE.NOT_FOUND)
+        }
+        res.send(client.rows[0])
+
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(STATUS_CODE.SERVER_ERROR)
+    }
 }
 
 async function createClient (req, res) {
 
     const clientData = res.locals.clientData
-    
-    res.sendStatus(STATUS_CODE.CREATED)
+    const {name, phone, cpf, birthday} = clientData
+
+    try {
+        await connection.query(`INSERT INTO customers 
+        (name, phone, cpf, birthday) 
+        VALUES ('${name}', '${phone}', '${cpf}', '${birthday}');`)
+
+        res.sendStatus(STATUS_CODE.CREATED)
+
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(STATUS_CODE.SERVER_ERROR)
+    }
 }
 
 async function updateClient (req, res) {
 
     const {id} = req.params
+    const clientData = req.body
+    let setString = ''
     
-    if(!id) {
-        return res.sendStatus(STATUS_CODE.UNAUTHORIZED)
+    for (let i in clientData) {
+        if (clientData[i].length > 0) {
+            setString += `${i} = '${clientData[i]}', `
+        }
     }
 
-    const clientData = res.locals.clientData
-    console.log(clientData)
-    res.sendStatus(STATUS_CODE.OK)
+    let query = `UPDATE customers SET ${setString} WHERE id = $1;`
+    query = query.replace(",  W", " W")
+
+    try {
+        await connection.query(query, [id])
+        res.sendStatus(STATUS_CODE.OK)
+        
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(STATUS_CODE.SERVER_ERROR)
+    }
 }
 
 
