@@ -1,10 +1,16 @@
 import STATUS_CODE from "../enums/statusCode.enum.js";
+import connection from "../database/database.js"
 
 async function listClients (req, res) {
 
     const {cpf} = req.query
 
-    res.send("lista de clientes")
+    try {
+        const clients = await connection.query('SELECT * FROM customers;')
+        res.send(clients.rows)
+    } catch (error) {
+        console.error(error)
+    }
 }
 
 async function listClientsById (req, res) {
