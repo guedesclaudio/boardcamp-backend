@@ -87,7 +87,7 @@ async function endsRental (req, res) {
             return res.sendStatus(STATUS_CODE.BAD_REQUEST)
         }
 
-        const delayFee = (rental.rentDate - date) * rental.pricePerDay //TA ERRADO, É SO A IDEIA
+        const delayFee = (rental.rentDate - date) * rental.pricePerDay //TA ERRADO, É SO A IDEIA// parei aqui
         await connection.query(`UPDATE rentals SET "returnDate" = '${date}', "delayFee" = ${150} WHERE id = $1`, [id])
         res.sendStatus(STATUS_CODE.OK)
 

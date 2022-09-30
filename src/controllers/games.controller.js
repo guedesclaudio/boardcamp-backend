@@ -4,9 +4,11 @@ import connection from "../database/database.js"
 async function listGames (req, res) {
 
     const {name} = req.query
-    const query1 = `SELECT * FROM games WHERE name LIKE '${name}%';`
-    const query2 = "SELECT * FROM games;"
-    const query = name ? query1 : query2
+    let query = "SELECT * FROM games;"
+    if (name) {
+        const formatName = name.toLowerCase()
+        query = `SELECT * FROM games WHERE name LIKE '${formatName}%';`
+    }
 
     try {
         const games = await connection.query(query)
@@ -17,6 +19,7 @@ async function listGames (req, res) {
             const categoryName = categories.rows.find(element => {
                 if (value.categoryId === element.id) return element.name
             })
+            value.name = value.name[0].toUpperCase() + value.name.substring(1)
             value.categoryName = categoryName.name
         })
         res.send(games.rows)
@@ -31,11 +34,12 @@ async function createGame (req, res) {
 
     const gameData = res.locals.gameData
     const {name, image, stockTotal, categoryId, pricePerDay} = gameData
+    const formatName = name.toLowerCase()
 
     try {
         await connection.query(`INSERT INTO games 
         ("name", "image", "stockTotal", "categoryId", "pricePerDay") 
-        VALUES ('${name}', '${image}', ${stockTotal}, ${categoryId}, ${pricePerDay});`)
+        VALUES ('${formatName}', '${image}', ${stockTotal}, ${categoryId}, ${pricePerDay});`)
         res.sendStatus(STATUS_CODE.CREATED)
 
     } catch (error) {
