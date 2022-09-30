@@ -23,8 +23,6 @@ async function createCategorie (req, res) {
     } catch (error) {
         res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
-    
-    
 }
 
 export {listCategories, createCategorie}

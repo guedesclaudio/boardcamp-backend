@@ -12,6 +12,7 @@ async function listGames (req, res) {
         const games = await connection.query(query)
         const categories = await connection.query("SELECT * FROM categories;")
 
+        //IMPLEMENTAR JOIN AQUI//
         games.rows.forEach(value => {
             const categoryName = categories.rows.find(element => {
                 if (value.categoryId === element.id) return element.name
