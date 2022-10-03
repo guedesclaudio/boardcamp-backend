@@ -16,7 +16,6 @@ async function listClients (req, res) {
         const clients = await connection.query(query)
         res.send(clients.rows)
     } catch (error) {
-        console.error(error)
         res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 }
@@ -38,7 +37,6 @@ async function listClientsById (req, res) {
         res.send(client.rows[0])
 
     } catch (error) {
-        console.error(error)
         res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 }
@@ -56,7 +54,6 @@ async function createClient (req, res) {
         res.sendStatus(STATUS_CODE.CREATED)
 
     } catch (error) {
-        console.error(error)
         res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 }
@@ -81,7 +78,6 @@ async function updateClient (req, res) {
         res.sendStatus(STATUS_CODE.OK)
         
     } catch (error) {
-        console.error(error)
         res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 }
