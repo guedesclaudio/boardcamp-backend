@@ -1,20 +1,6 @@
-import joi from "joi" 
+import { schemaClientName, schemaUpdateClientName } from "../schemas/clients.schema.js"
 import STATUS_CODE from "../enums/statusCode.enum.js"
 import connection from "../database/database.js"
-
-const schemaClientName = joi.object({
-    name: joi.string().empty().trim().required(),
-    phone: joi.string().empty().trim().min(10).max(11).required(),
-    cpf: joi.string().empty().trim().length(11).required(),
-    birthday: joi.date().iso().empty().required()
-})
-
-const schemaUpdateClientName = joi.object({
-    name: joi.string().empty().trim().required(),
-    phone: joi.string().empty().trim().min(10).max(11),
-    cpf: joi.string().empty().trim().length(11),
-    birthday: joi.string().empty().trim()
-})
 
 
 async function schemaClientValidation (req, res, next) {
@@ -48,7 +34,6 @@ async function schemaClientValidation (req, res, next) {
 
 async function updateClientValidation (req, res, next) {
 
-    console.log(req.body)
     const {phone, cpf} = req.body
     const {id} = req.params
     const {error} = schemaUpdateClientName.validate(req.body, {abortEarly: false})
@@ -56,11 +41,9 @@ async function updateClientValidation (req, res, next) {
     if(!id || isNaN(id)) {
         return res.sendStatus(STATUS_CODE.UNAUTHORIZED)
     }
-
     if ((phone && isNaN(phone)) || (cpf && isNaN(cpf))) {
         return res.sendStatus(STATUS_CODE.BAD_REQUEST)
     }
-
     if (error) {
         const errors = error.details.map(value => value.message) 
         return res.status(STATUS_CODE.BAD_REQUEST).send(errors)
@@ -71,7 +54,6 @@ async function updateClientValidation (req, res, next) {
     if (client.rows.length === 0) {
         return res.sendStatus(STATUS_CODE.NOT_FOUND)
     }
-
     if (cpf) {
         const cpfClient = await connection.query(`SELECT * FROM customers WHERE id <> $1 AND cpf = $2;`, [id, cpf])
 

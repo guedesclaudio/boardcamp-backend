@@ -1,12 +1,6 @@
-import joi from "joi" 
+import { schemaRental } from "../schemas/rentals.schema.js"
 import connection from "../database/database.js"
 import STATUS_CODE from "../enums/statusCode.enum.js"
-
-const schemaRental = joi.object({
-    customerId: joi.number().empty().required(),
-    gameId: joi.number().empty().required(),
-    daysRented: joi.number().empty().greater(0).required()
-})
 
 
 async function rentalCreateValidation (req, res, next) {
@@ -36,7 +30,6 @@ async function rentalCreateValidation (req, res, next) {
         console.error(error)
         res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
-    //verificar se existem alugueis disponiveis => 400
 }
 
 export {rentalCreateValidation}

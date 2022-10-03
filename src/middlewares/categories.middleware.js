@@ -1,10 +1,6 @@
-import joi from "joi" 
+import {schemaCategoryName} from "../schemas/categories.schema.js"
 import connection from "../database/database.js"
 import STATUS_CODE from "../enums/statusCode.enum.js"
-
-const schemaCategoryName = joi.object({
-    name: joi.string().empty().trim().required()
-})
 
 
 async function categoryCreateValidation (req, res, next) {
