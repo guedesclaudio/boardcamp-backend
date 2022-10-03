@@ -3,31 +3,32 @@ import connection from "../database/database.js"
 
 async function listGames (req, res) {
 
-    const {name} = req.query
+    const {name, offset} = req.query
+    const offSet = offset ? `OFFSET ${offset}` : ""
     let query = `SELECT games.*, categories.name AS "categoryName" 
-    FROM games JOIN categories ON games."categoryId" = categories.id;`
+    FROM games JOIN categories ON games."categoryId" = categories.id ${offSet};`
+
     if (name) {
+        console.log(name)
         const formatName = name.toLowerCase()
         query = `SELECT games.*, categories.name AS "categoryName" 
-        FROM games JOIN categories ON games."categoryId" = categories.id WHERE games.name LIKE '${formatName}%';`
+        FROM games JOIN categories ON games."categoryId" = 
+        categories.id WHERE games.name LIKE '${formatName}%' ${offSet};`
     }
 
     try {
         const games = await connection.query(query)
-        //IMPLEMENTAR JOIN AQUI//
         games.rows.forEach(value => {value.name = value.name[0].toUpperCase() + value.name.substring(1)})
         res.send(games.rows)
 
     } catch (error) {
-        console.error(error)
-        res.sendStatus(500)
+        res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 }
 
 async function createGame (req, res) {
 
-    const gameData = res.locals.gameData
-    const {name, image, stockTotal, categoryId, pricePerDay} = gameData
+    const {name, image, stockTotal, categoryId, pricePerDay} = res.locals.gameData
     const formatName = name.toLowerCase()
 
     try {
@@ -37,10 +38,8 @@ async function createGame (req, res) {
         res.sendStatus(STATUS_CODE.CREATED)
 
     } catch (error) {
-        console.error(error)
-        res.sendStatus(500)
+        res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 }
-
 
 export {listGames, createGame}

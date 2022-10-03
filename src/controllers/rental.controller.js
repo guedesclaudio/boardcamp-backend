@@ -37,7 +37,6 @@ async function listRentals (req, res) {
         res.send(rentals.rows)
 
     } catch (error) {
-        console.error(error)
         res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 }
@@ -50,10 +49,8 @@ async function createRental (req, res) {
     try {
         const originalPrice = daysRented * game[0].pricePerDay
         const rentDate = dayjs().format("DD/MM/YY")
-
         const games = await connection.query(`SELECT * FROM games WHERE id = ${gameId};`)
         const gameStock = games?.rows[0].stockTotal
-
         const openRentals = await connection.query(`SELECT * FROM rentals WHERE "gameId" = 3 AND "returnDate" IS NULL;`)
         
         if (openRentals.rows.length === gameStock) {
@@ -67,7 +64,6 @@ async function createRental (req, res) {
         res.sendStatus(STATUS_CODE.CREATED)
 
     } catch (error) {
-        console.error(error)
         res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 }
