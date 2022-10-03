@@ -4,24 +4,18 @@ import connection from "../database/database.js"
 async function listGames (req, res) {
 
     const {name} = req.query
-    let query = "SELECT * FROM games;"
+    let query = `SELECT games.*, categories.name AS "categoryName" 
+    FROM games JOIN categories ON games."categoryId" = categories.id;`
     if (name) {
         const formatName = name.toLowerCase()
-        query = `SELECT * FROM games WHERE name LIKE '${formatName}%';`
+        query = `SELECT games.*, categories.name AS "categoryName" 
+        FROM games JOIN categories ON games."categoryId" = categories.id WHERE games.name LIKE '${formatName}%';`
     }
 
     try {
         const games = await connection.query(query)
-        const categories = await connection.query("SELECT * FROM categories;")
-
         //IMPLEMENTAR JOIN AQUI//
-        games.rows.forEach(value => {
-            const categoryName = categories.rows.find(element => {
-                if (value.categoryId === element.id) return element.name
-            })
-            value.name = value.name[0].toUpperCase() + value.name.substring(1)
-            value.categoryName = categoryName.name
-        })
+        games.rows.forEach(value => {value.name = value.name[0].toUpperCase() + value.name.substring(1)})
         res.send(games.rows)
 
     } catch (error) {
