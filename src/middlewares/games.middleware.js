@@ -1,14 +1,6 @@
-import joi from "joi" 
+import {schemaGameName} from "../schemas/games.schema.js"
 import STATUS_CODE from "../enums/statusCode.enum.js"
 import connection from "../database/database.js"
-
-const schemaGameName = joi.object({
-    name: joi.string().empty().trim().required(),
-    image: joi.string().uri().optional(),
-    stockTotal: joi.number().empty().min(1).required(),
-    pricePerDay: joi.number().empty().min(1).required(),
-    categoryId: joi.number().empty().required()
-})
 
 
 async function gameCreateValidation (req, res, next) {
@@ -16,6 +8,7 @@ async function gameCreateValidation (req, res, next) {
     const {name, categoryId} = req.body
     const formatName = name.toLowerCase()
     const {error} = schemaGameName.validate(req.body, {abortEarly: false})
+    
     if (error) {
         const errors = error.details.map(value => value.message) 
         return res.status(STATUS_CODE.BAD_REQUEST).send(errors)
@@ -23,7 +16,7 @@ async function gameCreateValidation (req, res, next) {
 
     const categories = await connection.query(`SELECT * FROM categories WHERE id = $1;`, [categoryId])
     const games = await connection.query(`SELECT * FROM games WHERE name = $1;`, [formatName])
-    console.log(games.rows)
+    
         if (categories.rows.length === 0) {
             return res.sendStatus(STATUS_CODE.BAD_REQUEST)
         }
