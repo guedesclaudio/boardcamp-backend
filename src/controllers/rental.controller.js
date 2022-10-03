@@ -44,19 +44,25 @@ async function listRentals (req, res) {
 
 async function createRental (req, res) {
 
-    const rentalData = res.locals.Data.rentalData
     const game = res.locals.Data.gameData
-    const {gameId, daysRented, customerId} = rentalData
-    
+    const {gameId, daysRented, customerId} = res.locals.Data.rentalData
+   
     try {
         const originalPrice = daysRented * game[0].pricePerDay
         const rentDate = dayjs().format("DD/MM/YY")
-        const returnDate = "05/05/05"
-        const delayFee = 1000
+
+        const games = await connection.query(`SELECT * FROM games WHERE id = ${gameId};`)
+        const gameStock = games?.rows[0].stockTotal
+
+        const openRentals = await connection.query(`SELECT * FROM rentals WHERE "gameId" = 3 AND "returnDate" IS NULL;`)
+        
+        if (openRentals.rows.length === gameStock) {
+            return res.sendStatus(STATUS_CODE.BAD_REQUEST)
+        }
 
         await connection.query(`INSERT INTO rentals 
         ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee") VALUES 
-        (${customerId},${gameId}, '${rentDate}', ${daysRented}, '05/08/22' , ${originalPrice}, null);`)
+        (${customerId}, ${gameId}, '${rentDate}', ${daysRented}, null , ${originalPrice}, null);`)
 
         res.sendStatus(STATUS_CODE.CREATED)
 
@@ -76,19 +82,26 @@ async function endsRental (req, res) {
 
     try {
         const queryRental = await connection.query(`SELECT * FROM rentals WHERE id = $1`, [id])
-        const finishRental = await connection.query(`SELECT * FROM rentals WHERE id = $1 AND "returnDate" IS NOT null`, [id])
-        const rental = queryRental.rows[0]
-        const date = dayjs().format("DD/MM/YY") 
-        
+
         if (queryRental.rows.length === 0) {
             return res.sendStatus(STATUS_CODE.NOT_FOUND)
         }
+
+        const finishRental = await connection.query(`SELECT * FROM rentals WHERE id = $1 AND "returnDate" IS NOT null`, [id])
+        const rental = queryRental.rows[0]
+        const pricePerDay = rental.originalPrice / rental.daysRented;
+        const returnDate = dayjs();
+        const returnDateFormat = dayjs(returnDate)
+        const rentDateFormat = dayjs(rental.rentDate)
+        const dateToReturn = rentDateFormat.add(rental.daysRented, 'day')
+        const delayDays = returnDateFormat.diff(dateToReturn,'day')
+        const delayFee = delayDays > 0 ? delayDays * pricePerDay : 0
+        
         if (finishRental.rows.length > 0) {
             return res.sendStatus(STATUS_CODE.BAD_REQUEST)
         }
 
-        const delayFee = (rental.rentDate - date) * rental.pricePerDay //TA ERRADO, É SO A IDEIA// parei aqui
-        await connection.query(`UPDATE rentals SET "returnDate" = '${date}', "delayFee" = ${150} WHERE id = $1`, [id])
+        await connection.query(`UPDATE rentals SET "returnDate" = '${returnDate}', "delayFee" = ${delayFee} WHERE id = $1`, [id])
         res.sendStatus(STATUS_CODE.OK)
 
     } catch (error) {
@@ -107,11 +120,14 @@ async function deleteRental (req, res) {
     }
 
     try {
-        const rental = await connection.query(`SELECT * FROM rentals WHERE id = $1 AND "returnDate" IS NOT null;`, [id])
+        const rental = await connection.query(`SELECT * FROM rentals WHERE id = $1;`, [id])
         
         if (rental.rows.length === 0) {
-            return res.sendStatus(STATUS_CODE.NOT_FOUND) //decidir entre 404 e 400//
+            return res.sendStatus(STATUS_CODE.NOT_FOUND) 
         }
+        if (!rental.rows[0].returnDate) {
+            return res.sendStatus(STATUS_CODE.BAD_REQUEST)
+        } 
 
         await connection.query(`DELETE FROM rentals WHERE id = $1`, [id])
         res.sendStatus(STATUS_CODE.OK)

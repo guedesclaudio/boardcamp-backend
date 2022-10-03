@@ -6,7 +6,7 @@ const schemaClientName = joi.object({
     name: joi.string().empty().trim().required(),
     phone: joi.string().empty().trim().min(10).max(11).required(),
     cpf: joi.string().empty().trim().length(11).required(),
-    birthday: joi.string().empty().trim().required()
+    birthday: joi.date().iso().empty().required()
 })
 
 const schemaUpdateClientName = joi.object({
@@ -48,6 +48,7 @@ async function schemaClientValidation (req, res, next) {
 
 async function updateClientValidation (req, res, next) {
 
+    console.log(req.body)
     const {phone, cpf} = req.body
     const {id} = req.params
     const {error} = schemaUpdateClientName.validate(req.body, {abortEarly: false})
@@ -72,7 +73,8 @@ async function updateClientValidation (req, res, next) {
     }
 
     if (cpf) {
-        const cpfClient = await connection.query(`SELECT * FROM customers WHERE cpf = $1`, [cpf])
+        const cpfClient = await connection.query(`SELECT * FROM customers WHERE id <> $1 AND cpf = $2;`, [id, cpf])
+
         if (cpfClient.rows.length > 0) {
             return res.sendStatus(STATUS_CODE.CONFLICT)
         }
