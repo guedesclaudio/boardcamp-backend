@@ -3,8 +3,12 @@ import connection from "../database/database.js"
 
 async function listCategories (req, res) {
 
+    const {offset, limit} = req.query
+    const offSet = offset ? `OFFSET ${offset}` : ""
+    const dataLimit = limit ? `LIMIT ${limit}` : ""
+
     try {
-        const categories = await connection.query('SELECT * FROM categories;')
+        const categories = await connection.query(`SELECT * FROM categories ${offSet} ${dataLimit};`)
         res.send(categories.rows)
     } catch (error) {
         res.sendStatus(STATUS_CODE.SERVER_ERROR)

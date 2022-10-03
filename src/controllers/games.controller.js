@@ -3,10 +3,11 @@ import connection from "../database/database.js"
 
 async function listGames (req, res) {
 
-    const {name, offset} = req.query
+    const {name, offset, limit} = req.query
     const offSet = offset ? `OFFSET ${offset}` : ""
+    const dataLimit = limit ? `LIMIT ${limit}` : ""
     let query = `SELECT games.*, categories.name AS "categoryName" 
-    FROM games JOIN categories ON games."categoryId" = categories.id ${offSet};`
+    FROM games JOIN categories ON games."categoryId" = categories.id ${offSet} ${dataLimit};`
 
     if (name) {
         console.log(name)

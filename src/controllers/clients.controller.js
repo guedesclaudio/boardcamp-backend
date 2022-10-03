@@ -3,10 +3,14 @@ import connection from "../database/database.js"
 
 async function listClients (req, res) {
 
-    const {cpf} = req.query
-    const query1 = `SELECT * FROM customers WHERE cpf LIKE '${cpf}%'`
-    const query2 = `SELECT * FROM customers;`
-    const query = cpf ? query1 : query2
+    const {cpf, offset, limit} = req.query
+    const offSet = offset ? `OFFSET ${offset}` : ""
+    const dataLimit = limit ? `LIMIT ${limit}` : ""
+    let query = `SELECT * FROM customers ${offSet} ${dataLimit};`
+
+    if (cpf) {
+        query = `SELECT * FROM customers WHERE cpf LIKE '${cpf}%' ${offSet} ${dataLimit};`
+    }
 
     try {
         const clients = await connection.query(query)

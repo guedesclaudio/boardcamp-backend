@@ -4,15 +4,16 @@ import connection from "../database/database.js"
 
 async function listRentals (req, res) {
 
-    const {customerId} = req.query
-    const {gameId} = req.query
-    let query = `SELECT * FROM rentals;`
+    const {customerId,gameId, offset, limit} = req.query
+    const offSet = offset ? `OFFSET ${offset}` : ""
+    const dataLimit = limit ? `LIMIT ${limit}` : ""
+    let query = `SELECT * FROM rentals ${offSet} ${dataLimit};`
 
     if (customerId) {
-        query = `SELECT * FROM rentals WHERE "customerId" = ${customerId};`
+        query = `SELECT * FROM rentals WHERE "customerId" = ${customerId} ${offSet} ${dataLimit};`
     }
     if (gameId) {
-        query = `SELECT * FROM rentals WHERE "gameId" = ${gameId};`
+        query = `SELECT * FROM rentals WHERE "gameId" = ${gameId} ${offSet} ${dataLimit};`
     }
 
     try {
