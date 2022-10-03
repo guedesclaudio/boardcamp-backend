@@ -27,7 +27,6 @@ async function schemaClientValidation (req, res, next) {
         next()
 
     } catch (error) {
-        console.log(error)
         res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 }
