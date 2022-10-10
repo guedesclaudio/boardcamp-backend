@@ -102,7 +102,6 @@ async function endsRental (req, res) {
         res.sendStatus(STATUS_CODE.OK)
 
     } catch (error) {
-        console.error(error)
         res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 
@@ -130,7 +129,6 @@ async function deleteRental (req, res) {
         res.sendStatus(STATUS_CODE.OK)
 
     } catch (error) {
-        console.error(error)
         res.sendStatus(STATUS_CODE.SERVER_ERROR)
     }
 }

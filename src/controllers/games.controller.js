@@ -10,7 +10,6 @@ async function listGames (req, res) {
     FROM games JOIN categories ON games."categoryId" = categories.id ${offSet} ${dataLimit};`
 
     if (name) {
-        console.log(name)
         const formatName = name.toLowerCase()
         query = `SELECT games.*, categories.name AS "categoryName" 
         FROM games JOIN categories ON games."categoryId" = 
