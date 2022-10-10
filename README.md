@@ -1,7 +1,7 @@
 <div align="center">
   <h1>BOARDCAMP</h1>
   <br>
-  - Back-end de uma aplicação web para gerenciamento de aluguéis de jogos. 
+  - Back-end de uma aplicação web para gerenciamento de uma loja que lida com aluguéis de jogos de tabuleiro. 
   <br>
   <br>
 </div>
